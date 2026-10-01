@@ -1,0 +1,91 @@
+@page "/daycalc"
+<PageTitle>Day Calculator</PageTitle>
+@rendermode InteractiveServer
+
+<div class="minimal-container">
+    <h3>What day was it?</h3>
+
+    <form @onsubmit="FindTheDay">
+        <div class="inputs-row">
+            <input type="number" @bind="day" placeholder="DD" />
+            <span>/</span>
+            <input type="number" @bind="month" placeholder="MM" />
+            <span>/</span>
+            <input type="number" @bind="year" placeholder="YYYY" />
+        </div>
+        <button type="submit" style="display:none">Calculate</button>
+    </form>
+
+    <h2 class="result">@result</h2>
+</div>
+
+<style>
+    .minimal-container {
+        max-width: 300px;
+        margin: 50px auto;
+        text-align: center;
+        font-family: sans-serif;
+    }
+
+    .inputs-row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.5rem;
+        margin: 20px 0;
+    }
+
+    .inputs-row input {
+        width: 100px;
+        border: none;
+        border-bottom: 2px solid #ccc;
+        text-align: center;
+        font-size: 1.5rem;
+        outline: none;
+    }
+
+    .inputs-row input:focus {
+        border-bottom-color: #007acc;
+    }
+
+    .result {
+        color: #007acc;
+        font-weight: bold;
+        margin-top: 20px;
+        min-height: 2rem;
+    }
+</style>
+
+@code {
+    private int? day;
+    private int? month;
+    private int? year;
+    private string result = "";
+
+    private void FindTheDay()
+    {
+        // Only calculate if the user actually filled in all the boxes
+        if (day.HasValue && month.HasValue && year.HasValue)
+        {
+            result = CalculateDay(day.Value, month.Value, year.Value);
+        }
+    }
+
+    public string CalculateDay(int d, int m, int y)
+    {
+        int tempMonth = m;
+        int tempYear = y;
+
+        if (tempMonth < 3) { tempMonth += 12; tempYear -= 1; }
+
+        int K = tempYear % 100;
+        int J = tempYear / 100;
+        int h = (d + (13 * (tempMonth + 1) / 5) + K + (K / 4) + (J / 4) - (2 * J)) % 7;
+
+        string[] days = { "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" };
+        int index = (h + 7) % 7;
+
+        return days[index];
+    }
+}
